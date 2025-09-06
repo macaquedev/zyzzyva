@@ -217,7 +217,7 @@ AnalyzeQuizDialog::addMissed(const QStringList& words, bool update)
     if (words.empty())
         return;
 
-    missedCache += words.toSet();
+    missedCache += QSet<QString>(words.begin(), words.end());
 
     if (isVisible())
         moveCache();
@@ -278,7 +278,7 @@ AnalyzeQuizDialog::addIncorrect(const QStringList& words, bool update)
     if (words.empty())
         return;
 
-    incorrectCache += words.toSet();
+    incorrectCache += QSet<QString>(words.begin(), words.end());
 
     if (isVisible())
         moveCache();

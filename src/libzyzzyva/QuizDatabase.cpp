@@ -550,7 +550,7 @@ QuizDatabase::getReadyQuestions(const QStringList& questions, bool zeroFirst)
     unsigned int now = QDateTime::currentDateTime().toTime_t();
 
     bool selectAll = questions.isEmpty();
-    QSet<QString> questionSet = questions.toSet();
+    QSet<QString> questionSet(questions.begin(), questions.end());
 
     QString zQueryStr = zeroFirst ? QString(" OR cardbox = 0") : QString();
     QString queryStr = "SELECT question, cardbox FROM questions WHERE "

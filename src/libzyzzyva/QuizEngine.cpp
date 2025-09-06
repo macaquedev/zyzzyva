@@ -606,7 +606,7 @@ QuizEngine::prepareQuestion()
         answers += wordEngine->search(lexicon, spec, true);
     }
 
-    correctResponses += answers.toSet();
+    correctResponses += QSet<QString>(answers.begin(), answers.end());
     quizTotal += correctResponses.count();
 }
 

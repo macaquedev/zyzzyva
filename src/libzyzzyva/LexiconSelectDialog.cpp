@@ -248,7 +248,7 @@ LexiconSelectDialog::getCustomLexiconFile() const
 void
 LexiconSelectDialog::setImportLexicons(const QStringList& lexicons)
 {
-    QSet<QString> lexiconSet = lexicons.toSet();
+    QSet<QString> lexiconSet(lexicons.begin(), lexicons.end());
     QMapIterator<QString, QCheckBox*> it (lexiconCheckBoxes);
     while (it.hasNext()) {
         it.next();

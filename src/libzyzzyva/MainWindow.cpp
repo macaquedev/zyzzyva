@@ -833,7 +833,10 @@ MainWindow::editSettings()
     if (settingsDialog->exec() == QDialog::Accepted) {
         settingsChanged = true;
         oldAutoImport = MainSettings::getUseAutoImport();
-        oldLexicons = MainSettings::getAutoImportLexicons().toSet();
+        {
+            const QStringList list = MainSettings::getAutoImportLexicons();
+            oldLexicons = QSet<QString>(list.begin(), list.end());
+        }
         oldCustomFile = MainSettings::getAutoImportFile();
         oldStyles = MainSettings::getWordListLexiconStyles();
         settingsDialog->writeSettings();
@@ -850,7 +853,9 @@ MainWindow::editSettings()
     // Load any new lexicons that have been selected, but do not unload any
     // that have been deselected, because they might be in use (by a quiz, for
     // example).  If auto import was turned on, then all lexicons are new.
-    QSet<QString> newLexicons = MainSettings::getAutoImportLexicons().toSet();
+    QSet<QString> newLexicons(
+        MainSettings::getAutoImportLexicons().begin(),
+        MainSettings::getAutoImportLexicons().end());
     QSet<QString> addedLexicons = (newAutoImport && !oldAutoImport) ?
         newLexicons : newLexicons - oldLexicons;
 
@@ -1585,7 +1590,7 @@ MainWindow::rescheduleCardbox(const QStringList& words,
                 while (it.hasNext()) {
                     alphagramSet.insert(Auxil::getAlphagram(it.next()));
                 }
-                questions = QStringList::fromSet(alphagramSet);
+                questions = QStringList(alphagramSet.begin(), alphagramSet.end());
             }
             break;
 

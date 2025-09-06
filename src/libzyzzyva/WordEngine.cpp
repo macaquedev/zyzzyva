@@ -669,7 +669,7 @@ WordEngine::databaseSearch(const QString& lexicon, const SearchSpec&
         whereStr += ")";
     }
 
-    QStringList tablesList = tables.toList();
+    QStringList tablesList = tables.values();
     QString tableStr = " " + tablesList.join(", ");
     QString selectColStr = "word";
     if (tables.contains("words")) {
@@ -769,7 +769,7 @@ WordEngine::applyPostConditions(const QString& lexicon,
 
     // Keep only words in the limit ranges
     if (!limits.isEmpty()) {
-        QSet<QString> returnSet = returnList.toSet();
+        QSet<QString> returnSet(returnList.begin(), returnList.end());
         QMap<int, QMap<QString, QString> > probValueMap;
         QMap<QString, QString> playValueMap;
 
@@ -899,10 +899,13 @@ WordEngine::applyPostConditions(const QString& lexicon,
                 return QStringList();
 
             // Only keep candidates that matched constraints
-            returnSet &= (valueMap.values().mid(min, max - min + 1)).toSet();
+            {
+                const QStringList slice = valueMap.values().mid(min, max - min + 1);
+                returnSet &= QSet<QString>(slice.begin(), slice.end());
+            }
         }
 
-        returnList = returnSet.toList();
+        returnList = returnSet.values();
     }
 
     return returnList;
@@ -1056,7 +1059,7 @@ WordEngine::alphagrams(const QStringList& strList) const
         alphaSet.insert(Auxil::getAlphagram(str));
     }
 
-    QStringList alphaList = alphaSet.toList();
+    QStringList alphaList = alphaSet.values();
     std::sort(alphaList.begin(), alphaList.end(),
               Auxil::localeAwareLessThanQString);
     return alphaList;
@@ -2116,7 +2119,7 @@ WordEngine::nonGraphSearch(const QString& lexicon, const SearchSpec& spec) const
         finalWordSet = wordSet;
     }
 
-    return finalWordSet.toList();
+    return finalWordSet.values();
 }
 
 //----------------------------------------------------------------------------------------------------

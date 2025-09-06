@@ -957,6 +957,8 @@ QStringList
 WordEngine::search(const QString& lexicon, const SearchSpec& spec, bool
                    allCaps) const
 {
+    // Ensure comparator behavior matches the active lexicon
+    Auxil::setUseLocaleCollationForLexicon(lexicon);
     if (!lexiconData.contains(lexicon))
         return QStringList();
 

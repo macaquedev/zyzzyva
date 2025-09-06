@@ -87,6 +87,8 @@ namespace Auxil {
         int& revision);
     bool localeAwareLessThanQString(const QString& a, const QString& b);
     bool localeAwareLessThanQChar(const QChar& a, const QChar& b);
+    void setUseLocaleCollationForLexicon(const QString& lexicon);
+    bool getUseLocaleCollation();
 }
 
 #endif // ZYZZYVA_AUXIL_H

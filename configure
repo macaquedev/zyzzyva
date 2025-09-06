@@ -5,6 +5,5 @@ function b
 end
 
 function r
-    qmake && make -j (nproc) | cat
     env LD_LIBRARY_PATH=/home/macaque/Github/zyzzyva/bin ./bin/zyzzyva | cat
 end

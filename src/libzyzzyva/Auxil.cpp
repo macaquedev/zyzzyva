@@ -139,6 +139,8 @@ const QString WORD_LIST_FORMAT_DISTINCT_ALPHAGRAMS = "Distinct Alphagrams";
 
 using namespace Defs;
 
+static bool g_useLocaleCollation = false;
+
 //---------------------------------------------------------------------------
 //  localeAwareLessThanQString
 //
@@ -151,8 +153,8 @@ using namespace Defs;
 bool
 Auxil::localeAwareLessThanQString(const QString& a, const QString& b)
 {
-    // CSW-only: plain lexical compare is correct and faster than locale collation
-    return (a < b);
+    if (!g_useLocaleCollation) return (a < b);
+    return (QString::localeAwareCompare(a, b) < 0);
 }
 
 //---------------------------------------------------------------------------
@@ -167,8 +169,29 @@ Auxil::localeAwareLessThanQString(const QString& a, const QString& b)
 bool
 Auxil::localeAwareLessThanQChar(const QChar& a, const QChar& b)
 {
-    // CSW-only: plain lexical compare is correct and faster than locale collation
-    return (a < b);
+    if (!g_useLocaleCollation) return (a < b);
+    return (QString::localeAwareCompare(a, b) < 0);
+}
+
+void
+Auxil::setUseLocaleCollationForLexicon(const QString& lexicon)
+{
+    // English lexicons use fast ASCII sort
+    if (lexicon.contains("CSW", Qt::CaseInsensitive) ||
+        lexicon.contains("NWL", Qt::CaseInsensitive) ||
+        lexicon.contains("TWL", Qt::CaseInsensitive))
+    {
+        g_useLocaleCollation = false;
+    }
+    else {
+        g_useLocaleCollation = true;
+    }
+}
+
+bool
+Auxil::getUseLocaleCollation()
+{
+    return g_useLocaleCollation;
 }
 
 //---------------------------------------------------------------------------

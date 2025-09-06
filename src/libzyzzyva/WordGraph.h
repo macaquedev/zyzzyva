@@ -30,6 +30,9 @@
 #include <QFile>
 #include <QString>
 #include <QStringList>
+#include <QHash>
+#include <QSet>
+#include <QVector>
 
 class WordGraph
 {
@@ -80,6 +83,9 @@ class WordGraph
     QString reverseString(const QString& s) const;
     qint32 convertEndian(qint32* data, qint32 count);
 
+    void buildForwardTransitionIndex();
+    bool forwardTransition(qint32 node, QChar letter, qint32& outChild, bool& outEow) const;
+
     void addWordOld(const QString& w, bool reverse);
     bool containsWordOld(const QString& w) const;
     QStringList searchOld(const SearchSpec& spec) const;
@@ -89,6 +95,9 @@ class WordGraph
     qint32* rdawg;
 
     bool bigEndian;
+
+    // Fast transition index for forward DAWG: key = (node<<8)|letter, value packs child node and end-of-word flag
+    QHash<quint32, qint32> forwardTransitions;
 
     // OLD dawg structures - only used where new DAWG is unavailable
     Node* top;

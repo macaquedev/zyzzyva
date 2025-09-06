@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QList>
 #include <QRegExp>
+#include <QStack>
 #include <iostream>
 #include <map>
 #include <stack>
@@ -84,6 +85,7 @@ WordGraph::clear()
         delete[] rdawg;
     dawg = 0;
     rdawg = 0;
+    forwardTransitions.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -147,6 +149,73 @@ WordGraph::importDawgFile(const QString& filename, bool reverse, QString*
     if (bigEndian)
         convertEndian(p, numEdges);
 
+    // Build fast forward transition index when loading forward DAWG
+    if (!reverse && dawg) {
+        buildForwardTransitionIndex();
+    }
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+//  buildForwardTransitionIndex
+//
+//! Precompute O(1) transitions for (node,letter) pairs to reduce per-step
+//! edge scans in containsWord/search. Increases memory usage but reduces
+//! constants significantly.
+//---------------------------------------------------------------------------
+void
+WordGraph::buildForwardTransitionIndex()
+{
+    forwardTransitions.reserve(1 << 20); // heuristic; grows as needed
+    // Iterate all nodes reachable by scanning edges; nodes start at ROOT_NODE
+    // We compute for each node a mapping for its outgoing edges only.
+    QStack<qint32> stack;
+    QSet<qint32> visited;
+    stack.push(ROOT_NODE);
+    while (!stack.isEmpty()) {
+        qint32 node = stack.pop();
+        if (visited.contains(node) || node == TERMINAL_NODE)
+            continue;
+        visited.insert(node);
+
+        for (qint32* edge = &dawg[node]; ; ++edge) {
+            qint32 lc = *edge;
+            qint32 child = (lc & M_NODE_POINTER);
+            bool eow = (lc & M_END_OF_WORD) != 0;
+            lc = lc >> V_LETTER;
+            lc = lc & M_LETTER;
+            quint8 letter = static_cast<quint8>(static_cast<char>(lc));
+            quint32 key = (static_cast<quint32>(node) << 8) | letter;
+            // Pack child and eow into value: child in high bits, eow in bit0
+            qint32 packed = (child << 1) | (eow ? 1 : 0);
+            forwardTransitions.insert(key, packed);
+            if (child)
+                stack.push(child);
+            if (*edge & M_END_OF_NODE)
+                break;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+//  forwardTransition
+//
+//! O(1) transition lookup for forward DAWG.
+//---------------------------------------------------------------------------
+bool
+WordGraph::forwardTransition(qint32 node, QChar letter, qint32& outChild, bool& outEow) const
+{
+    if (!dawg)
+        return false;
+    quint8 c = static_cast<quint8>(letter.toLatin1());
+    quint32 key = (static_cast<quint32>(node) << 8) | c;
+    auto it = forwardTransitions.constFind(key);
+    if (it == forwardTransitions.constEnd())
+        return false;
+    qint32 packed = it.value();
+    outChild = (packed >> 1);
+    outEow = (packed & 1) != 0;
     return true;
 }
 
@@ -191,23 +260,13 @@ WordGraph::containsWord(const QString& w) const
     for (int i = 0; i < w.length(); ++i) {
         if (!node)
             return false;
-
         QChar letter = w.at(i);
-        for (qint32* edge = &dawg[node]; ; ++edge) {
-            qint32 lc = *edge;
-            lc = lc >> V_LETTER;
-            lc = lc & M_LETTER;
-            char c = (char) lc;
-
-            if (letter == c) {
-                node = (*edge & M_NODE_POINTER);
-                eow = (*edge & M_END_OF_WORD);
-                break;
-            }
-
-            if (*edge & M_END_OF_NODE)
-                return false;
-        }
+        qint32 child = 0;
+        bool stepEow = false;
+        if (!forwardTransition(node, letter, child, stepEow))
+            return false;
+        node = child;
+        eow = stepEow;
     }
 
     return eow;

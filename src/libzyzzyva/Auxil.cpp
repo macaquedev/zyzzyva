@@ -151,7 +151,8 @@ using namespace Defs;
 bool
 Auxil::localeAwareLessThanQString(const QString& a, const QString& b)
 {
-    return (QString::localeAwareCompare(a, b) < 0);
+    // CSW-only: plain lexical compare is correct and faster than locale collation
+    return (a < b);
 }
 
 //---------------------------------------------------------------------------
@@ -166,7 +167,8 @@ Auxil::localeAwareLessThanQString(const QString& a, const QString& b)
 bool
 Auxil::localeAwareLessThanQChar(const QChar& a, const QChar& b)
 {
-    return (QString::localeAwareCompare(a, b) < 0);
+    // CSW-only: plain lexical compare is correct and faster than locale collation
+    return (a < b);
 }
 
 //---------------------------------------------------------------------------

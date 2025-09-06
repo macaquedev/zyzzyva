@@ -41,7 +41,7 @@ class CardboxForm : public ActionForm
 {
     Q_OBJECT
     public:
-    CardboxForm(WordEngine* e, QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CardboxForm(WordEngine* e, QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     QIcon getIcon() const;
     QString getTitle() const;
     QString getStatusString() const;

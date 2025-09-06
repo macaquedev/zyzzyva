@@ -44,7 +44,7 @@ class SettingsDialog : public QDialog
 {
     Q_OBJECT
     public:
-    SettingsDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    SettingsDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~SettingsDialog();
 
     void readSettings();

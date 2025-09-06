@@ -120,7 +120,7 @@ JudgeSelectDialog::JudgeSelectDialog(QWidget* parent, Qt::WindowFlags f)
 
     messageLabel = new QLabel;
     QPalette messagePalette = messageLabel->palette();
-    messagePalette.setColor(QPalette::Foreground, Qt::red);
+    messagePalette.setColor(QPalette::WindowText, Qt::red);
     messageLabel->setAlignment(Qt::AlignHCenter);
     messageLabel->setPalette(messagePalette);
     mainVlay->addWidget(messageLabel);

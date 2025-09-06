@@ -38,7 +38,7 @@ class WordListSaveDialog : public QDialog
 {
     Q_OBJECT
     public:
-    WordListSaveDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    WordListSaveDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~WordListSaveDialog();
 
     QList<WordAttribute> getSelectedAttributes() const;

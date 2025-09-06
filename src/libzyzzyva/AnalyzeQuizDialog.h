@@ -44,7 +44,7 @@ class AnalyzeQuizDialog : public QDialog
     Q_OBJECT
     public:
     AnalyzeQuizDialog(QuizEngine* qe, WordEngine* we, QWidget* parent = 0,
-                      Qt::WindowFlags f = 0);
+                      Qt::WindowFlags f = Qt::WindowFlags());
 
     ~AnalyzeQuizDialog() { }
     WordTableView* getMissedView() { return missedView; }

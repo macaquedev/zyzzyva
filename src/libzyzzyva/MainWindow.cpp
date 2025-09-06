@@ -2050,8 +2050,7 @@ MainWindow::fixTrolltechConfig()
 
     QTextStream outStream (&file);
     foreach (const QString& line, lines) {
-        outStream << line;
-        endl(outStream);
+        outStream << line << Qt::endl;
     }
 }
 

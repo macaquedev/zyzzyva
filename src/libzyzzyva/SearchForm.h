@@ -42,7 +42,7 @@ class SearchForm : public ActionForm
 {
     Q_OBJECT
     public:
-    SearchForm(WordEngine* e, QWidget* parent = 0, Qt::WindowFlags f = 0);
+    SearchForm(WordEngine* e, QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     QIcon getIcon() const;
     QString getTitle() const;
     WordTableModel* getResultModel() const;

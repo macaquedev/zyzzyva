@@ -45,7 +45,7 @@ class CrosswordGameForm : public ActionForm
 {
     Q_OBJECT
     public:
-    CrosswordGameForm(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CrosswordGameForm(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~CrosswordGameForm();
     QIcon getIcon() const;
     QString getTitle() const;

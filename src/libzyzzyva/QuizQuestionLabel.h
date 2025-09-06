@@ -34,10 +34,10 @@ class QuizQuestionLabel : public QLabel
 {
     Q_OBJECT
     public:
-    QuizQuestionLabel(QWidget* parent = 0, Qt::WindowFlags f = 0)
+    QuizQuestionLabel(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags())
         : QLabel(parent, f) { }
     QuizQuestionLabel(const QString& text, QWidget* parent = 0,
-                      Qt::WindowFlags f = 0)
+                      Qt::WindowFlags f = Qt::WindowFlags())
         : QLabel(text, parent, f) { }
 
     virtual ~QuizQuestionLabel() { }

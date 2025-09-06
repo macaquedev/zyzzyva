@@ -36,7 +36,7 @@ class CrosswordGameRackWidget : public QFrame
     Q_OBJECT
 
     public:
-    CrosswordGameRackWidget(int player, QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CrosswordGameRackWidget(int player, QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;

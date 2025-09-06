@@ -677,8 +677,7 @@ WordTableView::exportFile(const QString& filename, WordListFormat format,
         for (int i = 0; i < model()->rowCount(); ++i) {
             index = index.sibling(i, WordTableModel::WORD_COLUMN);
             QStringList strings = getExportStrings(index, attributes);
-            stream << strings.join("\t");
-            endl(stream);
+            stream << strings.join("\t") << Qt::endl;
         }
     }
 
@@ -744,13 +743,11 @@ WordTableView::exportFile(const QString& filename, WordListFormat format,
                 stream << it.key().leftJustified(anagramWidth, ' ');
             }
             else if (format == WordListDistinctAlphagrams) {
-                stream << it.key();
-                endl(stream);
+                stream << it.key() << Qt::endl;
                 continue;
             }
             else {
-                stream << "Q: " << it.key();
-                endl(stream);
+                stream << "Q: " << it.key() << Qt::endl;
             }
 
             bool firstAnagram = true;
@@ -771,11 +768,11 @@ WordTableView::exportFile(const QString& filename, WordListFormat format,
                 else {
                     stream << "A: " << strings.join(" ");
                 }
-                endl(stream);
+                stream << Qt::endl;
             }
 
             if (!twoColumns) {
-                endl(stream);
+                stream << Qt::endl;
             }
         }
     }
@@ -918,7 +915,7 @@ WordTableView::addToCardbox(const QStringList& words, const QString& lexicon,
             while (it.hasNext()) {
                 alphagramSet.insert(Auxil::getAlphagram(it.next()));
             }
-            questions = QStringList::fromSet(alphagramSet);
+            questions = QStringList(alphagramSet.begin(), alphagramSet.end());
         }
         break;
 
@@ -966,7 +963,7 @@ WordTableView::removeFromCardbox(const QStringList& words, const QString&
             while (it.hasNext()) {
                 alphagramSet.insert(Auxil::getAlphagram(it.next()));
             }
-            questions = QStringList::fromSet(alphagramSet);
+            questions = QStringList(alphagramSet.begin(), alphagramSet.end());
         }
         break;
 

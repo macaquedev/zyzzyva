@@ -42,7 +42,7 @@ class SearchConditionForm : public QWidget
 {
     Q_OBJECT
     public:
-    SearchConditionForm(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    SearchConditionForm(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
     SearchCondition getSearchCondition() const;
     void setSearchCondition(const SearchCondition& condition);

@@ -47,7 +47,7 @@ class NewQuizDialog : public QDialog
 {
     Q_OBJECT
     public:
-    NewQuizDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    NewQuizDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~NewQuizDialog() { }
 
     QuizSpec getQuizSpec();

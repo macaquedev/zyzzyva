@@ -43,7 +43,7 @@ class JudgeDialog : public QDialog
     Q_OBJECT
     public:
     JudgeDialog(WordEngine* e, const QString& lex, const QString& pass =
-        QString(), QWidget* parent = 0, Qt::WindowFlags f = 0);
+        QString(), QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
     public slots:
     void textChanged();

@@ -38,7 +38,7 @@ class JudgeSelectDialog : public QDialog
 {
     Q_OBJECT
     public:
-    JudgeSelectDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    JudgeSelectDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~JudgeSelectDialog();
 
     QString getLexicon() const;

@@ -58,7 +58,7 @@ class QuizForm : public ActionForm
 {
     Q_OBJECT
     public:
-    QuizForm(WordEngine* we, QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QuizForm(WordEngine* we, QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~QuizForm();
     QIcon getIcon() const;
     QString getTitle() const;

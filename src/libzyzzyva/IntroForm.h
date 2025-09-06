@@ -35,7 +35,7 @@ class IntroForm : public ActionForm
 {
     Q_OBJECT
     public:
-    IntroForm(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    IntroForm(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~IntroForm() { }
     QIcon getIcon() const;
     QString getTitle() const;

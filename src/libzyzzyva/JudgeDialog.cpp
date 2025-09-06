@@ -217,7 +217,8 @@ JudgeDialog::JudgeDialog(WordEngine* e, const QString& lex,
     passwordLine->setFont(instructionFont);
     passwordLine->setEchoMode(QLineEdit::Password);
     passwordLine->setMinimumSize(0, instructionFontMetrics.height());
-    passwordLine->setMaximumSize(instructionFontMetrics.width('W') * 20, instructionFontMetrics.height());
+    passwordLine->setMaximumSize(instructionFontMetrics.horizontalAdvance(QChar('W')) * 20,
+                                 instructionFontMetrics.height());
     connect(passwordLine, SIGNAL(textChanged(const QString&)),
         SLOT(passwordTextChanged()));
     connect(passwordLine, SIGNAL(returnPressed()),
@@ -229,7 +230,7 @@ JudgeDialog::JudgeDialog(WordEngine* e, const QString& lex,
     passwordResultLabel = new QLabel;
     QFont passwordResultFont = instructionFont;
     QPalette passwordResultPalette = passwordResultLabel->palette();
-    passwordResultPalette.setColor(QPalette::Foreground, Qt::red);
+    passwordResultPalette.setColor(QPalette::WindowText, Qt::red);
     passwordResultLabel->setAlignment(Qt::AlignHCenter);
     passwordResultLabel->setFont(passwordResultFont);
     passwordResultLabel->setPalette(passwordResultPalette);
@@ -512,7 +513,7 @@ JudgeDialog::judgeWord()
     resultStr += "<br><br><font color=\"black\">" + wordStr + "</font>";
 
     QPalette pal = resultWidget->palette();
-    pal.setColor(QPalette::Foreground, resultColor);
+    pal.setColor(QPalette::WindowText, resultColor);
     resultWidget->setPalette(pal);
     resultLabel->setPalette(pal);
     resultLexiconLabel->setPalette(pal);
@@ -548,8 +549,7 @@ JudgeDialog::judgeWord()
         file.open(QIODevice::Append | QIODevice::Text);
         QTextStream stream (&file);
         foreach (const QString& word, acceptableWords) {
-            stream << word;
-            endl(stream);
+            stream << word << Qt::endl;
         }
     }
 
@@ -558,8 +558,7 @@ JudgeDialog::judgeWord()
         file.open(QIODevice::Append | QIODevice::Text);
         QTextStream stream (&file);
         foreach (const QString& word, unacceptableWords) {
-            stream << word;
-            endl(stream);
+            stream << word << Qt::endl;
         }
     }
 
@@ -571,7 +570,7 @@ JudgeDialog::judgeWord()
     foreach (const QString& word, words) {
         stream << " " << word;
     }
-    endl(stream);
+    stream << Qt::endl;
 }
 
 //---------------------------------------------------------------------------

@@ -34,7 +34,7 @@ class LexiconSelectWidget : public QWidget
 {
     Q_OBJECT
     public:
-    LexiconSelectWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    LexiconSelectWidget(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~LexiconSelectWidget();
 
     void setFont(const QFont& font);

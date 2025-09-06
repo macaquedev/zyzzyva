@@ -37,7 +37,7 @@ class CrosswordGameBoardWidget : public QFrame
 
     public:
     CrosswordGameBoardWidget(CrosswordGameGame* game, QWidget* parent = 0,
-                             Qt::WindowFlags f = 0);
+                             Qt::WindowFlags f = Qt::WindowFlags());
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;

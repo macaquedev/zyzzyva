@@ -51,7 +51,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     public:
     MainWindow(QWidget* parent = 0, QSplashScreen* splash = 0,
-               Qt::WindowFlags f = 0);
+               Qt::WindowFlags f = Qt::WindowFlags());
     ~MainWindow() { }
 
     static MainWindow* getInstance() { return instance; }

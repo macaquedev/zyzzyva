@@ -36,7 +36,7 @@ class CardboxAddDialog : public QDialog
 {
     Q_OBJECT
     public:
-    CardboxAddDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CardboxAddDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~CardboxAddDialog() { }
 
     public:

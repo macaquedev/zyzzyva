@@ -35,7 +35,7 @@ class CardboxRemoveDialog : public QDialog
 {
     Q_OBJECT
     public:
-    CardboxRemoveDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CardboxRemoveDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
     ~CardboxRemoveDialog() { }
 
     public:

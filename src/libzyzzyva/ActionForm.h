@@ -46,7 +46,7 @@ class ActionForm : public QFrame
     };
 
     public:
-    ActionForm(ActionFormType t, QWidget* parent = 0, Qt::WindowFlags f = 0)
+    ActionForm(ActionFormType t, QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowFlags())
         : QFrame(parent, f), type(t) { }
     virtual ~ActionForm() { }
     virtual ActionFormType getType() const { return type; }

@@ -158,11 +158,11 @@ WordEngineTest::testSearch()
     while (!resultFile.atEnd()) {
         expectedResults.append(resultFile.readLine().trimmed());
     }
-    qSort(expectedResults);
+    std::sort(expectedResults.begin(), expectedResults.end());
 
     // Do the search and test the results
     QStringList foundResults = engine.search(TEST_LEXICON, spec, true);
-    qSort(foundResults);
+    std::sort(foundResults.begin(), foundResults.end());
 
     QCOMPARE(foundResults, expectedResults);
 }

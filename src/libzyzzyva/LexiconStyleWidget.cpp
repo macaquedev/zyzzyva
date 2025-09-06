@@ -61,8 +61,8 @@ LexiconStyleWidget::LexiconStyleWidget(QWidget* parent, Qt::WindowFlags f)
 
     QStringList validLexicons;
     validLexicons.append(LEXICON_CSW24);
-    qSort(validLexicons.begin(), validLexicons.end(),
-          Auxil::localeAwareLessThanQString);
+    std::sort(validLexicons.begin(), validLexicons.end(),
+              Auxil::localeAwareLessThanQString);
 
     QString defaultLexicon = MainSettings::getDefaultLexicon();
     int defaultIndex = validLexicons.indexOf(defaultLexicon);

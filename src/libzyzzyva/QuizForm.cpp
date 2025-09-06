@@ -1425,13 +1425,13 @@ QuizForm::setQuestionLabel(const QString& question, const QString& order)
                 qchars.append(displayQuestion.at(i));
 
             if (letterOrder == Defs::QUIZ_LETTERS_VOWELS_FIRST) {
-                qSort(qchars.begin(), qchars.end(), vowelsFirstCmp);
+                std::sort(qchars.begin(), qchars.end(), vowelsFirstCmp);
             }
             else if (letterOrder == Defs::QUIZ_LETTERS_CONSONANTS_FIRST) {
-                qSort(qchars.begin(), qchars.end(), consonantsFirstCmp);
+                std::sort(qchars.begin(), qchars.end(), consonantsFirstCmp);
             }
             else if (letterOrder == Defs::QUIZ_LETTERS_ALPHA) {
-                qSort(qchars.begin(), qchars.end(), alphabeticalCmp);
+                std::sort(qchars.begin(), qchars.end(), alphabeticalCmp);
             }
 
             char chars[MAX_WORD_LEN + 1];

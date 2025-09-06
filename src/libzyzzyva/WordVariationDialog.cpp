@@ -389,8 +389,8 @@ WordVariationDialog::getWordItems(const QList<SearchSpec>& searchSpecs) const
         }
         QString wildcard;
         if (!wildcardChars.isEmpty()) {
-            qSort(wildcardChars.begin(), wildcardChars.end(),
-                  Auxil::localeAwareLessThanQChar);
+            std::sort(wildcardChars.begin(), wildcardChars.end(),
+                      Auxil::localeAwareLessThanQChar);
             foreach (const QChar& c, wildcardChars)
                 wildcard.append(c.toUpper());
         }

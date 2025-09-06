@@ -609,7 +609,7 @@ Auxil::getAlphagram(const QString& word)
     for (int i = 0; i < word.length(); ++i) {
         chars.append(word[i]);
     }
-    qSort(chars.begin(), chars.end(), localeAwareLessThanQChar);
+    std::sort(chars.begin(), chars.end(), localeAwareLessThanQChar);
     foreach (const QChar& c, chars)
         alphagram.append(c);
 

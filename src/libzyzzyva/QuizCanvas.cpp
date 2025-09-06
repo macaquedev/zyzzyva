@@ -379,7 +379,7 @@ void
 QuizCanvas::squeezeTileImages()
 {
     QList<QLabel*> labels = findChildren<QLabel*>(LABEL_SHOW_STRING);
-    qSort(labels.begin(), labels.end(), xLessThan);
+    std::sort(labels.begin(), labels.end(), xLessThan);
 
     int x = QUIZ_TILE_MARGIN + ((numCanvasTiles - labels.size()) *
             (maxTileWidth + QUIZ_TILE_SPACING)) / 2;

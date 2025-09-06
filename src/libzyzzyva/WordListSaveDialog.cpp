@@ -323,7 +323,7 @@ WordListSaveDialog::moveSelection(QListWidget* src, QListWidget* dest)
     }
 
     // Move rows in reverse sorted order so row numbers are not messed up
-    qSort(selectedRows.begin(), selectedRows.end(), qGreater<int>());
+    std::sort(selectedRows.begin(), selectedRows.end(), std::greater<int>());
     QListIterator<int> jt (selectedRows);
     int insertRow = dest->count();
     while (jt.hasNext()) {

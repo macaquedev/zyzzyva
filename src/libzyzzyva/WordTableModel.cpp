@@ -720,7 +720,7 @@ WordTableModel::setData(const QModelIndex& index, const QVariant& value, int
 void
 WordTableModel::sort(int, Qt::SortOrder)
 {
-    qSort(wordList.begin(), wordList.end(), lessThan);
+    std::sort(wordList.begin(), wordList.end(), lessThan);
 
     if (MainSettings::getWordListGroupByAnagrams())
         markAlternates();

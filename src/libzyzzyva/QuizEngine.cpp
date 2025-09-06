@@ -181,8 +181,8 @@ QuizEngine::newQuiz(const QuizSpec& spec)
                     questionPairs.append(qMakePair(question, combos));
                 }
 
-                qSort(questionPairs.begin(), questionPairs.end(),
-                      probabilityCmp);
+                std::sort(questionPairs.begin(), questionPairs.end(),
+                          probabilityCmp);
 
                 quizQuestions.clear();
                 QListIterator<QPair<QString, double> > jt (questionPairs);

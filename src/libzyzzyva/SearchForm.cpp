@@ -392,8 +392,9 @@ SearchForm::search()
                     onlyAnagramStar = true;
             }
         }
-        resultModel->addWords(wordItems, /*skipSort*/ onlyAnagramStar);
-        qWarning() << "Benchmark(UI): model.addWords=" << addTimer.elapsed() << "ms, rows=" << resultModel->rowCount();
+        // Replace entire model in one reset to minimize UI churn
+        resultModel->setAllWords(wordItems, /*skipSort*/ onlyAnagramStar);
+        qWarning() << "Benchmark(UI): model.setAllWords=" << addTimer.elapsed() << "ms, rows=" << resultModel->rowCount();
         MainSettings::setWordListSortByPlayabilityOrder(false);
         MainSettings::setWordListSortByProbabilityOrder(false);
         if (hasSubanagramCondition)

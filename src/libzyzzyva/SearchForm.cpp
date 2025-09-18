@@ -40,6 +40,8 @@
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QTimer>
+#include <QElapsedTimer>
+#include <QDebug>
 
 using namespace Defs;
 
@@ -251,6 +253,7 @@ SearchForm::selectInputArea()
 void
 SearchForm::search()
 {
+    QElapsedTimer uiTotalTimer; uiTotalTimer.start();
     SearchSpec spec = specForm->getSearchSpec();
     if (spec.conditions.empty())
         return;
@@ -267,8 +270,9 @@ SearchForm::search()
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    QStringList wordList =
-        wordEngine->search(lexicon, specForm->getSearchSpec(), false);
+    QElapsedTimer engineTimer; engineTimer.start();
+    QStringList wordList = wordEngine->search(lexicon, specForm->getSearchSpec(), false);
+    qWarning() << "Benchmark(UI): engine.search total=" << engineTimer.elapsed() << "ms, results=" << wordList.size();
 
     bool hasAnagramCondition = false;
     bool hasSubanagramCondition = false;
@@ -311,6 +315,7 @@ SearchForm::search()
         }
 
         // Create a list of WordItem objects from the words
+        QElapsedTimer itemsTimer; itemsTimer.start();
         QList<WordTableModel::WordItem> wordItems;
         foreach (const QString& word, wordList) {
             QString wildcard;
@@ -339,6 +344,12 @@ SearchForm::search()
 
             WordTableModel::WordItem wordItem
                 (displayWord, WordTableModel::WordNormal, wildcard);
+            // Prime cached sort keys once during build
+            (void)wordItem.getUpperCached();
+            if (MainSettings::getWordListGroupByAnagrams())
+                (void)wordItem.getAlphagramCached();
+            if (MainSettings::getWordListSortByLength())
+                (void)wordItem.getLengthCached();
 
             // Set probability/playability order for correct sorting
             if (hasProbabilityCondition) {
@@ -357,6 +368,7 @@ SearchForm::search()
 
             wordItems.append(wordItem);
         }
+        qWarning() << "Benchmark(UI): build WordItems=" << itemsTimer.elapsed() << "ms, items=" << wordItems.size();
 
         // FIXME: Probably not the right way to get alphabetical sorting instead
         // of alphagram sorting
@@ -370,7 +382,9 @@ SearchForm::search()
         else if (hasPlayabilityCondition)
             MainSettings::setWordListSortByPlayabilityOrder(true);
         resultModel->setProbabilityNumBlanks(probNumBlanks);
+        QElapsedTimer addTimer; addTimer.start();
         resultModel->addWords(wordItems);
+        qWarning() << "Benchmark(UI): model.addWords=" << addTimer.elapsed() << "ms, rows=" << resultModel->rowCount();
         MainSettings::setWordListSortByPlayabilityOrder(false);
         MainSettings::setWordListSortByProbabilityOrder(false);
         if (hasSubanagramCondition)
@@ -379,7 +393,9 @@ SearchForm::search()
             MainSettings::setWordListGroupByAnagrams(origGroupByAnagrams);
     }
 
+    QElapsedTimer statusTimer; statusTimer.start();
     updateResultTotal(wordList.size(), resultModel->getAlphagramGroupsCount(), hasAnagramCondition);
+    qWarning() << "Benchmark(UI): updateResultTotal=" << statusTimer.elapsed() << "ms";
     emit saveEnabledChanged(!wordList.empty());
     emit printEnabledChanged(!wordList.empty());
 
@@ -394,6 +410,7 @@ SearchForm::search()
 
     searchButton->setEnabled(true);
     QApplication::restoreOverrideCursor();
+    qWarning() << "Benchmark(UI): total UI update=" << uiTotalTimer.elapsed() << "ms";
 }
 
 //---------------------------------------------------------------------------

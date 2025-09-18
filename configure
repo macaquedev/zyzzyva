@@ -5,5 +5,5 @@ function b
 end
 
 function r
-    env LD_LIBRARY_PATH=/home/macaque/Github/zyzzyva/bin ./bin/zyzzyva | cat
+    env LD_LIBRARY_PATH=/home/macaque/github/zyzzyva/bin ./bin/zyzzyva | cat
 end

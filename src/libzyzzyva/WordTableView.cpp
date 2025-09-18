@@ -54,6 +54,7 @@
 #include <QToolTip>
 #include <QDebug>
 #include <QFont>
+#include <QElapsedTimer>
 
 using namespace std;
 
@@ -130,8 +131,19 @@ WordTableView::resizeItemsRecursively()
 void
 WordTableView::resizeItemsToContents()
 {
-    for (int i = 0; i < model()->columnCount(); ++i)
+    if (!model()) return;
+    int rows = model()->rowCount();
+    QElapsedTimer total; total.start();
+    if (rows > 50000) {
+        qWarning() << "Benchmark(View): skip resizeItemsToContents for large row count=" << rows;
+        return;
+    }
+    for (int i = 0; i < model()->columnCount(); ++i) {
+        QElapsedTimer col; col.start();
         resizeColumnToContents(i);
+        qWarning() << "Benchmark(View): resizeColumnToContents col=" << i << "time=" << col.elapsed() << "ms";
+    }
+    qWarning() << "Benchmark(View): resizeItemsToContents total=" << total.elapsed() << "ms, rows=" << rows;
 }
 
 //----------------------------------------------------------------------------

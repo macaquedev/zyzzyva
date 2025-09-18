@@ -29,6 +29,7 @@
 #include <QAbstractTableModel>
 #include <QChar>
 #include <QStringList>
+#include "Auxil.h"
 
 class WordEngine;
 
@@ -67,13 +68,36 @@ class WordTableModel : public QAbstractTableModel
         double getPlayabilityValue() const { return playabilityValue; }
         int getPlayabilityOrder() const { return playabilityOrder; }
         QString getLexiconSymbols() const { return lexiconSymbols; }
-        void setWord(const QString& w) { word = w; }
+        void setWord(const QString& w) { word = w; upperValid = false; alphagramValid = false; lengthValid = false; }
         void setType(WordType t) { type = t; }
         void setWildcard(const QString& w) { wildcard = w; }
         void setProbabilityOrder(int p);
         void setPlayabilityValue(double p);
         void setPlayabilityOrder(int p);
         void setLexiconSymbols(const QString& s);
+
+        // Cached sort keys
+        const QString& getUpperCached() const {
+            if (!upperValid) {
+                upperCached = word.toUpper();
+                upperValid = true;
+            }
+            return upperCached;
+        }
+        const QString& getAlphagramCached() const {
+            if (!alphagramValid) {
+                alphagramCached = Auxil::getAlphagram(getUpperCached());
+                alphagramValid = true;
+            }
+            return alphagramCached;
+        }
+        int getLengthCached() const {
+            if (!lengthValid) {
+                lengthCached = word.length();
+                lengthValid = true;
+            }
+            return lengthCached;
+        }
 
         void setHooks(const QString& front, const QString& back);
         void setParentHooks(bool front, bool back);
@@ -107,6 +131,13 @@ class WordTableModel : public QAbstractTableModel
         bool frontParentHook;
         bool backParentHook;
         QString lexiconSymbols;
+        // Cached sort keys
+        mutable QString upperCached;
+        mutable QString alphagramCached;
+        mutable int lengthCached;
+        mutable bool upperValid = false;
+        mutable bool alphagramValid = false;
+        mutable bool lengthValid = false;
     };
 
     Q_OBJECT

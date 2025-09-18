@@ -28,6 +28,8 @@
 #include "MainSettings.h"
 #include "Auxil.h"
 #include <QBrush>
+#include <QElapsedTimer>
+#include <QDebug>
 
 using namespace std;
 
@@ -88,8 +90,8 @@ lessThan(const WordTableModel::WordItem& a,
     }
 
     if (MainSettings::getWordListSortByLength()) {
-        int aLen = a.getWord().length();
-        int bLen = b.getWord().length();
+        int aLen = a.getLengthCached();
+        int bLen = b.getLengthCached();
         bool reverse = MainSettings::getWordListSortByReverseLength();
         if ((!reverse && (aLen < bLen)) || (reverse && (aLen > bLen)))
             return true;
@@ -98,8 +100,8 @@ lessThan(const WordTableModel::WordItem& a,
     }
 
     if (MainSettings::getWordListGroupByAnagrams()) {
-        QString aa = Auxil::getAlphagram(a.getWord().toUpper());
-        QString ab = Auxil::getAlphagram(b.getWord().toUpper());
+        const QString& aa = a.getAlphagramCached();
+        const QString& ab = b.getAlphagramCached();
         int compare = QString::localeAwareCompare(aa, ab);
         if (compare < 0)
             return true;
@@ -116,8 +118,8 @@ lessThan(const WordTableModel::WordItem& a,
             return false;
     }
 
-    return (QString::localeAwareCompare(a.getWord().toUpper(),
-                                        b.getWord().toUpper()) < 0);
+    return (QString::localeAwareCompare(a.getUpperCached(),
+                                        b.getUpperCached()) < 0);
 }
 
 //---------------------------------------------------------------------------
@@ -195,17 +197,27 @@ WordTableModel::addWord(const WordItem& word, bool updateLastAdded)
 bool
 WordTableModel::addWords(const QList<WordItem>& words)
 {
+    QElapsedTimer totalTimer; totalTimer.start();
     int row = rowCount();
+    QElapsedTimer insertTimer; insertTimer.start();
     bool ok = insertRows(row, words.size());
     if (!ok)
         return false;
+    qWarning() << "Benchmark(Model): insertRows=" << insertTimer.elapsed() << "ms, count=" << words.size();
+
+    QElapsedTimer fillTimer; fillTimer.start();
     foreach (const WordItem& word, words) {
         addWordPrivate(word, row);
         ++row;
     }
+    qWarning() << "Benchmark(Model): fillRows(setData)=" << fillTimer.elapsed() << "ms";
+
+    QElapsedTimer sortTimer; sortTimer.start();
     sort(WORD_COLUMN);
+    qWarning() << "Benchmark(Model): sort(total)=" << sortTimer.elapsed() << "ms";
     lastAddedIndex = -1;
     emit wordsChanged();
+    qWarning() << "Benchmark(Model): addWords total=" << totalTimer.elapsed() << "ms";
     return true;
 }
 
@@ -720,10 +732,15 @@ WordTableModel::setData(const QModelIndex& index, const QVariant& value, int
 void
 WordTableModel::sort(int, Qt::SortOrder)
 {
+    QElapsedTimer tSort; tSort.start();
     std::sort(wordList.begin(), wordList.end(), lessThan);
+    qWarning() << "Benchmark(Model): std::sort=" << tSort.elapsed() << "ms, items=" << wordList.size();
 
-    if (MainSettings::getWordListGroupByAnagrams())
+    if (MainSettings::getWordListGroupByAnagrams()) {
+        QElapsedTimer tAlt; tAlt.start();
         markAlternates();
+        qWarning() << "Benchmark(Model): markAlternates=" << tAlt.elapsed() << "ms";
+    }
 
     emit dataChanged(index(0, 0),
                      index(wordList.size() - 1, DEFINITION_COLUMN));

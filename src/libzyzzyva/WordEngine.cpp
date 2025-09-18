@@ -36,6 +36,8 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QVector>
+#include <QElapsedTimer>
+#include <QDebug>
 
 using namespace Defs;
 
@@ -435,6 +437,9 @@ WordEngine::databaseSearch(const QString& lexicon, const SearchSpec&
     if (!lexiconData.contains(lexicon) || !lexiconData[lexicon]->db)
         return QStringList();
 
+    QElapsedTimer buildTimer;
+    buildTimer.start();
+
     // Build SQL query string
     QSet<QString> tables;
     QString whereStr;
@@ -684,14 +689,27 @@ WordEngine::databaseSearch(const QString& lexicon, const SearchSpec&
     // Query the database
     QStringList resultList;
     QSqlDatabase* db = lexiconData[lexicon]->db;
+    qWarning()
+        << "Benchmark: databaseSearch: build_where+select="
+        << buildTimer.elapsed() << "ms"
+        << ", wordListFilter=" << (wordList ? 1 : 0)
+        << ", wordListCount=" << (wordList ? wordList->size() : 0)
+        << ", queryLen=" << queryStr.length();
+
+    QElapsedTimer execTimer;
+    execTimer.start();
     QSqlQuery query (queryStr, *db);
+    int rows = 0;
     while (query.next()) {
         QString word = query.value(0).toString();
         if (!upperToLower.isEmpty() && upperToLower.contains(word)) {
             word = upperToLower[word];
         }
         resultList.append(word);
+        ++rows;
     }
+    qWarning() << "Benchmark: databaseSearch: exec+fetch=" << execTimer.elapsed()
+               << "ms, rows=" << rows;
 
     return resultList;
 }
@@ -962,6 +980,20 @@ WordEngine::search(const QString& lexicon, const SearchSpec& spec, bool
     if (!lexiconData.contains(lexicon))
         return QStringList();
 
+    QElapsedTimer totalTimer;
+    totalTimer.start();
+
+    // Detect simplest full-lexicon case: only condition is AnagramMatch "*"
+    bool onlyAnagramStar = false;
+    if (spec.conditions.count() == 1) {
+        const SearchCondition& c = spec.conditions.first();
+        if ((c.type == SearchCondition::AnagramMatch) && !c.negated) {
+            QString canon = Auxil::getCanonicalSearchString(c.stringValue);
+            if (canon == "*")
+                onlyAnagramStar = true;
+        }
+    }
+
     SearchSpec optimizedSpec = spec;
     optimizedSpec.optimize(lexicon);
 
@@ -990,22 +1022,38 @@ WordEngine::search(const QString& lexicon, const SearchSpec& spec, bool
     if (phaseCounts.value(WordGraphPhase) ||
         !phaseCounts.value(DatabasePhase))
     {
+        QElapsedTimer graphTimer;
+        graphTimer.start();
         resultList = wordGraphSearch(lexicon, optimizedSpec);
+        qWarning() << "Benchmark: wordGraphSearch:"
+                   << graphTimer.elapsed() << "ms, results="
+                   << resultList.size()
+                   << (onlyAnagramStar ? ", AnagramMatch='*'" : "");
         if (resultList.isEmpty())
             return resultList;
     }
 
     // Search the database if necessary, passing word graph results
     if (phaseCounts.value(DatabasePhase)) {
+        QElapsedTimer dbPhaseTimer;
+        dbPhaseTimer.start();
         resultList = databaseSearch(lexicon, optimizedSpec,
             phaseCounts.contains(WordGraphPhase) ? &resultList : 0);
+        qWarning() << "Benchmark: databasePhase total:"
+                   << dbPhaseTimer.elapsed() << "ms, results="
+                   << resultList.size();
         if (resultList.isEmpty())
             return resultList;
     }
 
     // Check post conditions if necessary
     if (phaseCounts.value(PostConditionPhase)) {
+        QElapsedTimer postTimer;
+        postTimer.start();
         resultList = applyPostConditions(lexicon, optimizedSpec, resultList);
+        qWarning() << "Benchmark: postConditions:"
+                   << postTimer.elapsed() << "ms, results="
+                   << resultList.size();
     }
 
     // Convert to all caps if necessary
@@ -1018,9 +1066,15 @@ WordEngine::search(const QString& lexicon, const SearchSpec& spec, bool
     if (!resultList.isEmpty()) {
         // JGM testing... Why should the cache be cleared at every wordEngine::search() call??  Test relevant timings with and without.
         //clearCache(lexicon);
+        QElapsedTimer cacheTimer;
+        cacheTimer.start();
         addToCache(lexicon, resultList);
+        qWarning() << "Benchmark: addToCache:"
+                   << cacheTimer.elapsed() << "ms, words="
+                   << resultList.size();
     }
 
+    qWarning() << "Benchmark: total search time:" << totalTimer.elapsed() << "ms";
     return resultList;
 }
 

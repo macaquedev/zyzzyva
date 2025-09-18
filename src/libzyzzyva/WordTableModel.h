@@ -147,7 +147,8 @@ class WordTableModel : public QAbstractTableModel
 
     bool clear();
     bool addWord(const WordItem& word, bool updateLastAdded = true);
-    bool addWords(const QList<WordItem>& words);
+    bool addWords(const QList<WordItem>& words, bool skipSort = false);
+    bool setAllWords(const QList<WordItem>& words, bool skipSort = false);
     bool removeWord(const QString& word);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;

@@ -383,7 +383,16 @@ SearchForm::search()
             MainSettings::setWordListSortByPlayabilityOrder(true);
         resultModel->setProbabilityNumBlanks(probNumBlanks);
         QElapsedTimer addTimer; addTimer.start();
-        resultModel->addWords(wordItems);
+        bool onlyAnagramStar = false;
+        if (spec.conditions.count() == 1) {
+            const SearchCondition& c = spec.conditions.first();
+            if ((c.type == SearchCondition::AnagramMatch) && !c.negated) {
+                QString canon = Auxil::getCanonicalSearchString(c.stringValue);
+                if (canon == "*")
+                    onlyAnagramStar = true;
+            }
+        }
+        resultModel->addWords(wordItems, /*skipSort*/ onlyAnagramStar);
         qWarning() << "Benchmark(UI): model.addWords=" << addTimer.elapsed() << "ms, rows=" << resultModel->rowCount();
         MainSettings::setWordListSortByPlayabilityOrder(false);
         MainSettings::setWordListSortByProbabilityOrder(false);

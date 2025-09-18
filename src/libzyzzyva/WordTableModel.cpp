@@ -195,7 +195,7 @@ WordTableModel::addWord(const WordItem& word, bool updateLastAdded)
 //! @return true if successful, false otherwise
 //---------------------------------------------------------------------------
 bool
-WordTableModel::addWords(const QList<WordItem>& words)
+WordTableModel::addWords(const QList<WordItem>& words, bool skipSort)
 {
     QElapsedTimer totalTimer; totalTimer.start();
     int row = rowCount();
@@ -212,12 +212,48 @@ WordTableModel::addWords(const QList<WordItem>& words)
     }
     qWarning() << "Benchmark(Model): fillRows(setData)=" << fillTimer.elapsed() << "ms";
 
-    QElapsedTimer sortTimer; sortTimer.start();
-    sort(WORD_COLUMN);
-    qWarning() << "Benchmark(Model): sort(total)=" << sortTimer.elapsed() << "ms";
+    if (!skipSort) {
+        QElapsedTimer sortTimer; sortTimer.start();
+        sort(WORD_COLUMN);
+        qWarning() << "Benchmark(Model): sort(total)=" << sortTimer.elapsed() << "ms";
+    } else {
+        qWarning() << "Benchmark(Model): sort skipped";
+    }
     lastAddedIndex = -1;
     emit wordsChanged();
     qWarning() << "Benchmark(Model): addWords total=" << totalTimer.elapsed() << "ms";
+    return true;
+}
+
+//---------------------------------------------------------------------------
+//  setAllWords
+//
+//! Replace the entire model list in one shot and emit a single model reset.
+//
+//! @param words the word items to set
+//! @return true if successful, false otherwise
+//---------------------------------------------------------------------------
+bool
+WordTableModel::setAllWords(const QList<WordItem>& words, bool skipSort)
+{
+    QElapsedTimer totalTimer; totalTimer.start();
+    beginResetModel();
+    wordList = words;
+    if (!skipSort) {
+        QElapsedTimer sortTimer; sortTimer.start();
+        std::sort(wordList.begin(), wordList.end(), lessThan);
+        qWarning() << "Benchmark(Model): std::sort (reset)=" << sortTimer.elapsed() << "ms, items=" << wordList.size();
+        if (MainSettings::getWordListGroupByAnagrams()) {
+            QElapsedTimer tAlt; tAlt.start();
+            markAlternates();
+            qWarning() << "Benchmark(Model): markAlternates (reset)=" << tAlt.elapsed() << "ms";
+        }
+    } else {
+        qWarning() << "Benchmark(Model): sort skipped (reset)";
+    }
+    endResetModel();
+    emit wordsChanged();
+    qWarning() << "Benchmark(Model): setAllWords total=" << totalTimer.elapsed() << "ms";
     return true;
 }
 
